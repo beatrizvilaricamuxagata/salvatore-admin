@@ -12,10 +12,16 @@ export default function AdminPanel() {
   }, []);
 
   const fetchLicencas = async () => {
-    const res = await fetch("/api/licencas");
-    const data = await res.json();
-    setLicencas(data);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/licencas");
+      const data = await res.json();
+      setLicencas(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Erro ao buscar licenças:", err);
+      setLicencas([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -105,7 +111,11 @@ export default function AdminPanel() {
             </tr>
           </thead>
           <tbody>
-            {licencas.map(lic => (
+            {loading ? (
+              <tr><td colSpan={6} className="p-8 text-center text-slate-400">Carregando licenças...</td></tr>
+            ) : licencas.length === 0 ? (
+              <tr><td colSpan={6} className="p-8 text-center text-slate-400">Nenhuma licença encontrada.</td></tr>
+            ) : licencas.map(lic => (
               <tr key={lic._id} className="border-t border-slate-700 hover:bg-slate-750 transition">
                 <td className="p-4 font-mono">{lic.cliente_id}</td>
                 <td className="p-4">

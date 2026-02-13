@@ -2,9 +2,9 @@ import clientPromise from "../../../../lib/mongodb";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
-export async function PATCH(request, { params }) {
+export async function PATCH(request, context) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const body = await request.json();
     const client = await clientPromise;
     const db = client.db("robo_salvatore");
@@ -20,9 +20,9 @@ export async function PATCH(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, context) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const client = await clientPromise;
     const db = client.db("robo_salvatore");
 

@@ -6,6 +6,7 @@ export default function AdminPanel() {
   const [formData, setFormData] = useState({ cliente_id: "", email: "", nome: "", plano: "1_MES", marketing_mode: false });
   const [bulkDays, setBulkDays] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [busca, setBusca] = useState("");
 
   useEffect(() => {
     fetchLicencas();
@@ -97,6 +98,17 @@ export default function AdminPanel() {
         </div>
       </div>
 
+      {/* Busca */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por ID, nome ou e-mail..."
+          className="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none focus:border-cyan-500 text-white placeholder-slate-500"
+          value={busca}
+          onChange={e => setBusca(e.target.value)}
+        />
+      </div>
+
       {/* Tabela */}
       <div className="bg-slate-800 rounded-xl shadow-lg border border-slate-700 overflow-hidden">
         <table className="w-full text-left">
@@ -115,7 +127,17 @@ export default function AdminPanel() {
               <tr><td colSpan={6} className="p-8 text-center text-slate-400">Carregando licenças...</td></tr>
             ) : licencas.length === 0 ? (
               <tr><td colSpan={6} className="p-8 text-center text-slate-400">Nenhuma licença encontrada.</td></tr>
-            ) : licencas.map(lic => (
+            ) : licencas
+              .filter(lic => {
+                if (!busca.trim()) return true;
+                const termo = busca.toLowerCase();
+                return (
+                  String(lic.cliente_id).toLowerCase().includes(termo) ||
+                  (lic.nome && lic.nome.toLowerCase().includes(termo)) ||
+                  (lic.email && lic.email.toLowerCase().includes(termo))
+                );
+              })
+              .map(lic => (
               <tr key={lic._id} className="border-t border-slate-700 hover:bg-slate-750 transition">
                 <td className="p-4 font-mono">{lic.cliente_id}</td>
                 <td className="p-4">

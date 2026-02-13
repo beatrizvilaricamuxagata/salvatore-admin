@@ -61,9 +61,17 @@ export default function AdminPanel() {
     fetchLicencas();
   };
 
+  const [copiado, setCopiado] = useState("");
+
+  const copiar = (texto, label) => {
+    navigator.clipboard.writeText(texto);
+    setCopiado(label);
+    setTimeout(() => setCopiado(""), 1500);
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white p-8 font-sans">
-      <h1 className="text-3xl font-bold mb-8 text-center text-cyan-400">🚀 SALVATORE ADMIN</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-cyan-400">SALVATORE ADMIN</h1>
 
       {/* Form Criar */}
       <div className="bg-slate-800 p-6 rounded-xl shadow-lg mb-8 border border-slate-700">
@@ -99,14 +107,33 @@ export default function AdminPanel() {
       </div>
 
       {/* Busca */}
-      <div className="mb-4">
+      <div className="mb-4 flex gap-2">
         <input
           type="text"
-          placeholder="Buscar por ID, nome ou e-mail..."
-          className="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none focus:border-cyan-500 text-white placeholder-slate-500"
+          placeholder="Buscar por ID, nome ou e-mail... (cole aqui)"
+          className="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none focus:border-cyan-500 text-white placeholder-slate-500"
           value={busca}
           onChange={e => setBusca(e.target.value)}
         />
+        <button
+          onClick={async () => {
+            const texto = await navigator.clipboard.readText();
+            setBusca(texto);
+          }}
+          className="bg-slate-700 hover:bg-slate-600 px-4 rounded-xl border border-slate-600 text-sm text-slate-300 transition"
+          title="Colar da area de transferencia"
+        >
+          Colar
+        </button>
+        {busca && (
+          <button
+            onClick={() => setBusca("")}
+            className="bg-slate-700 hover:bg-slate-600 px-4 rounded-xl border border-slate-600 text-sm text-slate-300 transition"
+            title="Limpar busca"
+          >
+            Limpar
+          </button>
+        )}
       </div>
 
       {/* Tabela */}
@@ -139,10 +166,30 @@ export default function AdminPanel() {
               })
               .map(lic => (
               <tr key={lic._id} className="border-t border-slate-700 hover:bg-slate-750 transition">
-                <td className="p-4 font-mono">{lic.cliente_id}</td>
+                <td className="p-4 font-mono">
+                  <span className="inline-flex items-center gap-2">
+                    {lic.cliente_id}
+                    <button
+                      onClick={() => copiar(String(lic.cliente_id), `id-${lic._id}`)}
+                      className="text-slate-500 hover:text-cyan-400 transition text-xs"
+                      title="Copiar ID"
+                    >
+                      {copiado === `id-${lic._id}` ? "copiado!" : "copiar"}
+                    </button>
+                  </span>
+                </td>
                 <td className="p-4">
                   <div className="font-bold">{lic.nome}</div>
-                  <div className="text-sm text-slate-400">{lic.email}</div>
+                  <div className="text-sm text-slate-400 inline-flex items-center gap-2">
+                    {lic.email}
+                    <button
+                      onClick={() => copiar(lic.email, `email-${lic._id}`)}
+                      className="text-slate-500 hover:text-cyan-400 transition text-xs"
+                      title="Copiar e-mail"
+                    >
+                      {copiado === `email-${lic._id}` ? "copiado!" : "copiar"}
+                    </button>
+                  </div>
                 </td>
                 <td className="p-4">
                   {lic.vitalicio ? <span className="text-yellow-400 font-bold">VITALÍCIO</span> : new Date(lic.vencimento).toLocaleDateString()}

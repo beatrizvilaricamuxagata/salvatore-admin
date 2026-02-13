@@ -117,8 +117,13 @@ export default function AdminPanel() {
         />
         <button
           onClick={async () => {
-            const texto = await navigator.clipboard.readText();
-            setBusca(texto);
+            try {
+              const texto = await navigator.clipboard.readText();
+              setBusca(texto);
+            } catch {
+              const texto = prompt("Cole o texto aqui:");
+              if (texto) setBusca(texto);
+            }
           }}
           className="bg-slate-700 hover:bg-slate-600 px-4 rounded-xl border border-slate-600 text-sm text-slate-300 transition"
           title="Colar da area de transferencia"
